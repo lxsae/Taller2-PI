@@ -5,6 +5,7 @@
 Sistema inteligente de recomendación de películas que utiliza reconocimiento de voz para entender tus preferencias y sugerir películas relevantes.
 
 # ✨ Características Principales
+
 - 🎤 Reconocimiento de Voz: Habla con el sistema usando tu micrófono
 
 - 🤖 Procesamiento de Lenguaje Natural: Entiende consultas complejas en español
@@ -15,8 +16,10 @@ Sistema inteligente de recomendación de películas que utiliza reconocimiento d
 
 - 🌐 Interfaz Web: Fácil de usar desde cualquier navegador
 
-# 🚀 Instalación 
+# 🚀 Instalación
+
 # Prerrequisitos
+
 - Python 3.8 o superior
 
 - Micrófono funcionando
@@ -26,23 +29,35 @@ Sistema inteligente de recomendación de películas que utiliza reconocimiento d
 # Configuración
 
 # 1. Descargar el proyecto y entrar en la carpeta
-cd cine_voice
 
+`cd cine_voice`
 
 # Crear entorno virtual
-- ```python -m venv cinevoice_env```
+
+- `python -m venv cinevoice_env`
 
 # Activar entorno virtual
+
 # Windows:
-- ```cinevoice_env\Scripts\activate```
+
+- `cinevoice_env\Scripts\activate`
+
 # Linux/Mac:
-- ```source cinevoice_env/bin/activate```
+
+- `source cinevoice_env/bin/activate`
 
 # 2. Instalar dependencias
-- ```pip install -r requirements.txt```
+
+- `pip install -r requirements.txt`
 
 # 3. Ejecutar la aplicación
-- ```python app.py```
+
+- `python app.py`
 
 # 4. Abrir en el navegador
-- ```http://localhost:5000```
+
+- `http://localhost:5000`
+
+# 5. Importante
+
+- crear tu archivo .env y agregar tu KEY de Assembly IA
