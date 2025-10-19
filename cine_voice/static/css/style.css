@@ -1,0 +1,45 @@
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+    max-width: 800px;
+}
+
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+}
+
+.btn {
+    border-radius: 25px;
+    padding: 12px 30px;
+    margin: 5px;
+}
+
+#recordBtn {
+    background: linear-gradient(45deg, #FF416C, #FF4B2B);
+    border: none;
+}
+
+#stopBtn {
+    background: linear-gradient(45deg, #7474BF, #348AC7);
+    border: none;
+}
+
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+.card {
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}

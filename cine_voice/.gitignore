@@ -1,0 +1,64 @@
+# Crea el archivo .gitignore con todo lo necesario
+@"
+# Entornos virtuales
+cinevoice_env/
+venv/
+env/
+ENV/
+
+# Modelos de ML y archivos pesados
+models/
+whisper_model/
+*.pth
+*.bin
+*.dll
+*.onnx
+*.pkl
+
+# Cache de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Archivos temporales
+temp_audio.wav
+*.tmp
+*.temp
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+
+
+# Archivos grandes específicos de PyTorch
+torch_cpu.dll
+torch.lib
+"@ | Out-File -FilePath .gitignore -Encoding utf8
