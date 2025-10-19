@@ -41,15 +41,8 @@ cd cine_voice
 # 2. Instalar dependencias
 - ```pip install -r requirements.txt```
 
-# 2.1 Si tienes problemas de instalacion
-
-- Instalar dependencias básicas primero: 
-- ```pip install Flask pandas numpy scikit-learn```
-
-- Luego Whisper:  ``` pip install whisper-openai ```
-
-# 4. Ejecutar la aplicación
+# 3. Ejecutar la aplicación
 - ```python app.py```
 
-# 5. Abrir en el navegador
+# 4. Abrir en el navegador
 - ```http://localhost:5000```
