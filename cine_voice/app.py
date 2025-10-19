@@ -364,29 +364,9 @@ def recommend_movies():
         print(f"❌ Error en recomendaciones: {e}")
         return jsonify({'error': str(e), 'success': False})
 
-# Ruta para debug mejorada
-@app.route('/debug')
-def debug_info():
-    # Extraer actores únicos para debug
-    all_actors = set()
-    for actors_str in movies_df['actors']:
-        if pd.notna(actors_str):
-            actors = [actor.strip() for actor in re.split(r',|\s+y\s+', actors_str)]
-            all_actors.update(actors)
-    
-    info = {
-        'total_movies': len(movies_df),
-        'columns': list(movies_df.columns),
-        'unique_years': sorted(movies_df['year'].unique()),
-        'unique_genres': list(set([genre for genres in movies_df['genres'] for genre in genres.split()])),
-        'unique_directors': sorted(movies_df['director'].unique()),
-        'sample_actors': sorted(list(all_actors))[:10],  # Primeros 10 actores
-        'movies': movies_df[['title', 'year', 'genres', 'director']].to_dict('records')
-    }
-    return jsonify(info)
+
 
 if __name__ == '__main__':
     print("🚀 Iniciando servidor Flask...")
     print("📍 Abre http://localhost:5000 en tu navegador")
-    print("🐛 Debug: http://localhost:5000/debug")
     app.run(debug=True, port=5000)
