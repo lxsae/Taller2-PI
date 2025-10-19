@@ -1,142 +1,148 @@
 class VoiceRecorder {
     constructor() {
+        // Coincidir los IDs con tu HTML
+        this.recordButton = document.getElementById("recordBtn");
+        this.stopButton = document.getElementById("stopBtn");
+        this.transcriptionDiv = document.getElementById("transcription");
+        this.moviesList = document.getElementById("moviesList");
+
         this.mediaRecorder = null;
         this.audioChunks = [];
-        this.isRecording = false;
-        
-        this.recordBtn = document.getElementById('recordBtn');
-        this.stopBtn = document.getElementById('stopBtn');
-        this.transcriptionDiv = document.getElementById('transcription');
-        this.moviesList = document.getElementById('moviesList');
-        
-        this.initEventListeners();
+
+        this.init();
     }
-    
-    initEventListeners() {
-        this.recordBtn.addEventListener('click', () => this.startRecording());
-        this.stopBtn.addEventListener('click', () => this.stopRecording());
+
+    init() {
+        this.recordButton.addEventListener("click", () => this.startRecording());
+        this.stopButton.addEventListener("click", () => this.stopRecording());
     }
-    
+
     async startRecording() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             this.mediaRecorder = new MediaRecorder(stream);
             this.audioChunks = [];
-            
+
             this.mediaRecorder.ondataavailable = (event) => {
                 this.audioChunks.push(event.data);
             };
-            
-            this.mediaRecorder.onstop = () => {
-                this.sendAudioToServer();
+
+            this.mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(this.audioChunks, { type: "audio/wav" });
+                const formData = new FormData();
+                formData.append("audio", audioBlob, "voz_usuario.wav");
+
+                this.transcriptionDiv.textContent = "🎙️ Analizando tu voz...";
+
+                const response = await fetch("/transcribe", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const result = await response.json();
+                console.log("🎤 Respuesta del servidor:", result);
+
+                if (result.success) {
+                    const voiceText = result.text.toLowerCase().trim();
+                    this.transcriptionDiv.textContent = `🗣️ ${voiceText}`;
+
+                    // 🔍 Detección de comandos de voz
+                    if (voiceText.includes("asiento") || voiceText.includes("silla")) {
+                        this.redirigirA("/asientos");
+                        return;
+                    }
+                    if (voiceText.includes("comida") || voiceText.includes("snack")) {
+                        this.redirigirA("/comida");
+                        return;
+                    }
+                    if (voiceText.includes("pagar") || voiceText.includes("comprar")) {
+                        this.redirigirA("/resumen");
+                        return;
+                    }
+
+                    // Si no es comando, buscar películas
+                    this.getRecommendations(voiceText);
+                } else {
+                    this.transcriptionDiv.textContent = "❌ Error en la transcripción. Intenta de nuevo.";
+                }
             };
-            
+
             this.mediaRecorder.start();
-            this.isRecording = true;
-            
-            this.recordBtn.disabled = true;
-            this.stopBtn.disabled = false;
-            this.transcriptionDiv.textContent = "Escuchando... 🎤";
-            
+            this.recordButton.disabled = true;
+            this.stopButton.disabled = false;
+            this.transcriptionDiv.textContent = "🎧 Grabando... habla ahora";
+
         } catch (error) {
-            console.error("Error al acceder al micrófono:", error);
-            alert("No se pudo acceder al micrófono. Permite el acceso e intenta de nuevo.");
+            console.error("Error al iniciar grabación:", error);
+            this.transcriptionDiv.textContent = "🚫 No se pudo acceder al micrófono.";
         }
     }
-    
+
     stopRecording() {
-        if (this.mediaRecorder && this.isRecording) {
+        if (this.mediaRecorder && this.mediaRecorder.state !== "inactive") {
             this.mediaRecorder.stop();
-            this.isRecording = false;
-            
-            this.recordBtn.disabled = false;
-            this.stopBtn.disabled = true;
-            this.transcriptionDiv.textContent = "Procesando tu voz... ⏳";
-            
-            // Detener todas las pistas de audio
-            this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            this.recordButton.disabled = false;
+            this.stopButton.disabled = true;
         }
     }
-    
-    async sendAudioToServer() {
-        try {
-            const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
-            const formData = new FormData();
-            formData.append('audio', audioBlob, 'recording.wav');
-            
-            // Enviar audio para transcripción
-            const response = await fetch('/transcribe', {
-                method: 'POST',
-                body: formData
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                this.transcriptionDiv.textContent = result.text;
-                this.getRecommendations(result.text);
-            } else {
-                this.transcriptionDiv.textContent = "Error en la transcripción. Intenta de nuevo.";
-            }
-            
-        } catch (error) {
-            console.error("Error:", error);
-            this.transcriptionDiv.textContent = "Error de conexión. Intenta de nuevo.";
-        }
+
+    // 🔄 Redirigir con mensaje de voz
+    redirigirA(url) {
+        const mensajes = {
+            "/asientos": "Llevándote a la selección de asientos 🎟️",
+            "/comida": "Vamos a la sección de comida 🍿",
+            "/resumen": "Mostrando el resumen de tu compra 💳"
+        };
+        const mensaje = mensajes[url] || "Redirigiendo...";
+
+        this.transcriptionDiv.textContent = mensaje;
+        const utter = new SpeechSynthesisUtterance(mensaje);
+        utter.lang = "es-ES";
+        window.speechSynthesis.speak(utter);
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 2000);
     }
-    
+
+    // 🎬 Obtener recomendaciones
     async getRecommendations(text) {
         try {
-            const response = await fetch('/recommend', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ text: text })
+            const response = await fetch("/recommend", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text }),
             });
-            
+
             const result = await response.json();
-            
-            if (result.success) {
-                this.displayRecommendations(result.recommendations);
+            if (result.success && result.recommendations.length > 0) {
+                this.showRecommendations(result.recommendations);
             } else {
-                this.moviesList.innerHTML = '<div class="alert alert-warning">No pude encontrar recomendaciones. Intenta con otra descripción.</div>';
+                this.moviesList.innerHTML = "<p>No se encontraron resultados.</p>";
             }
-            
         } catch (error) {
-            console.error("Error:", error);
-            this.moviesList.innerHTML = '<div class="alert alert-danger">Error al obtener recomendaciones.</div>';
+            console.error("Error en recomendación:", error);
         }
     }
-    
-    displayRecommendations(movies) {
-        if (movies.length === 0) {
-            this.moviesList.innerHTML = '<div class="alert alert-warning">No encontré películas que coincidan. Intenta con otra descripción.</div>';
-            return;
-        }
-        
-        let html = '';
-        movies.forEach(movie => {
-            html += `
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">${movie.title} (${movie.year})</h5>
-                        <p class="card-text"><strong>Géneros:</strong> ${movie.genres}</p>
-                        <p class="card-text"><strong>Actores:</strong> ${movie.actors}</p>
-                        <p class="card-text"><strong>Director:</strong> ${movie.director}</p>
-                        <p class="card-text"><strong>Rating:</strong> ⭐ ${movie.rating}/10</p>
-                        <p class="card-text"><strong>Ambiente:</strong> ${movie.mood}</p>
-                        <p class="card-text">${movie.plot}</p>
-                    </div>
-                </div>
+
+    // 🎞 Mostrar películas recomendadas
+    showRecommendations(movies) {
+        this.moviesList.innerHTML = "";
+        movies.forEach((movie) => {
+            const div = document.createElement("div");
+            div.classList.add("movie-card", "p-3", "mb-3", "border", "rounded");
+            div.innerHTML = `
+                <h5>${movie.title} (${movie.year})</h5>
+                <p><strong>Géneros:</strong> ${movie.genres}</p>
+                <p><strong>Actores:</strong> ${movie.actors}</p>
+                <p><strong>Director:</strong> ${movie.director}</p>
+                <p><strong>Rating:</strong> ⭐ ${movie.rating}/10</p>
+                <p><strong>Ambiente:</strong> ${movie.mood}</p>
+                <p>${movie.plot}</p>
             `;
+            this.moviesList.appendChild(div);
         });
-        
-        this.moviesList.innerHTML = html;
     }
 }
 
-// Inicializar cuando se carga la página
-document.addEventListener('DOMContentLoaded', () => {
-    new VoiceRecorder();
-});
+window.addEventListener("DOMContentLoaded", () => new VoiceRecorder());
