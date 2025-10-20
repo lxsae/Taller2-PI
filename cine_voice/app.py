@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -6,22 +6,16 @@ import numpy as np
 from dotenv import load_dotenv
 import os
 import re
-import assemblyai as aai
-from flask_session import Session
+import assemblyai as aai  # ✅ Integración AssemblyAI
 
-# -------------------------------
-# ⚙️ CONFIGURACIÓN BASE
-# -------------------------------
 load_dotenv()
 app = Flask(__name__)
-app.secret_key = "cine_voice_secret"
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
 
 # -------------------------------
 # ⚙️ CONFIGURACIÓN AssemblyAI
 # -------------------------------
-aai.settings.api_key = os.getenv("ASSEMBLYAI_API_KEY")
+aai.settings.api_key = os.getenv("ASSEMBLYAI_API_KEY") 
+
 
 # -------------------------------
 # 🎬 CARGA DE DATOS DE PELÍCULAS
@@ -47,11 +41,14 @@ def load_movie_data():
                 movies_df[col] = default
 
         return movies_df
+
     except Exception as e:
         print(f"❌ ERROR cargando CSV: {e}")
         raise SystemExit(1)
 
+
 movies_df = load_movie_data()
+
 
 # -------------------------------
 # 🧠 SISTEMA DE RECOMENDACIÓN
@@ -75,11 +72,14 @@ def prepare_recommendation_system():
         print("✅ Sistema de recomendación listo")
 
         return vectorizer, feature_matrix
+
     except Exception as e:
         print(f"❌ Error en sistema de recomendación: {e}")
         return None, None
 
+
 vectorizer, feature_matrix = prepare_recommendation_system()
+
 
 # -------------------------------
 # 🔊 TRANSCRIPCIÓN CON AssemblyAI
@@ -96,49 +96,54 @@ def transcribe_audio():
 
         temp_path = 'temp_audio.wav'
         audio_file.save(temp_path)
+
         print("🎤 Enviando audio a AssemblyAI...")
 
-        config = aai.TranscriptionConfig(language_code="es", speaker_labels=True)
+        # Configuración de la transcripción
+        config = aai.TranscriptionConfig(
+            language_code="es",
+            speaker_labels=True,
+            
+            #summarization=True,
+            #summary_model="informative",
+            #summary_type="bullets"
+        )
+
         transcriber = aai.Transcriber()
         transcript = transcriber.transcribe(temp_path, config=config)
 
+        # Manejo de errores
         if transcript.error:
             raise Exception(f"Error en AssemblyAI: {transcript.error}")
 
         text = transcript.text.strip()
-        os.remove(temp_path)
+
+        # Obtener resumen
+        summary = getattr(transcript, "summary", None)
+        if summary and isinstance(summary, dict):
+            summary = summary.get("text")
+
+        # Eliminar archivo temporal
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
 
         print(f"📝 Transcripción AssemblyAI: {text[:120]}...")
 
-        # 🗣 Detección de comando por voz
-        voice_action = detect_voice_action(text)
-        if voice_action:
-            return jsonify({'text': text, 'action': voice_action, 'success': True})
+        return jsonify({
+            'text': text,
+            'summary': summary,
+            'success': True
+        })
 
-        return jsonify({'text': text, 'success': True})
     except Exception as e:
         print(f"❌ Error en transcripción: {e}")
         if os.path.exists('temp_audio.wav'):
             os.remove('temp_audio.wav')
         return jsonify({'error': str(e), 'success': False})
 
-# -------------------------------
-# 🧭 DETECCIÓN DE COMANDOS DE VOZ
-# -------------------------------
-def detect_voice_action(text):
-    text = text.lower()
-    if "asiento" in text or "silla" in text:
-        return "ir_asientos"
-    if "comida" in text or "combo" in text:
-        return "ir_comida"
-    if "pagar" in text or "comprar" in text or "confirmar" in text:
-        return "ir_resumen"
-    if "película" in text or "recomienda" in text or "ver" in text:
-        return "buscar_pelicula"
-    return None
 
 # -------------------------------
-# 🎯 FILTROS DE CONSULTA DE PELÍCULAS
+# 🎯 FILTROS Y ANÁLISIS DE CONSULTA
 # -------------------------------
 def apply_precise_filters(user_text, movies_subset=None):
     if movies_subset is None:
@@ -147,24 +152,70 @@ def apply_precise_filters(user_text, movies_subset=None):
     filtered_movies = movies_subset.copy()
     print(f"🎯 Aplicando filtros precisos para: {text}")
 
+    # ---------- FILTRO POR AÑO ----------
     year_match = re.search(r'\b(19|20)\d{2}\b', text)
     if year_match:
         year = int(year_match.group())
         filtered_movies = filtered_movies[filtered_movies['year'] == year]
         print(f"📅 Filtrando por año: {year}")
 
+    # ---------- FILTRO POR GÉNERO ----------
     genre_keywords = {
-        'acción': 'accion', 'aventura': 'aventura', 'comedia': 'comedia',
-        'drama': 'drama', 'romance': 'romance', 'terror': 'terror',
-        'thriller': 'thriller', 'ficción': 'ciencia ficcion',
-        'animación': 'animacion', 'familiar': 'familiar'
+        'acción': 'accion', 'accion': 'accion', 'aventura': 'aventura',
+        'comedia': 'comedia', 'drama': 'drama', 'romance': 'romance',
+        'terror': 'terror', 'thriller': 'thriller', 'suspenso': 'thriller',
+        'ficción': 'ciencia ficcion', 'ciencia ficción': 'ciencia ficcion',
+        'animación': 'animacion', 'familiar': 'familiar',
+        'musical': 'musical', 'biografía': 'biografia'
     }
     for keyword, genre in genre_keywords.items():
         if keyword in text:
             filtered_movies = filtered_movies[filtered_movies['genres'].str.contains(genre, case=False, na=False)]
             print(f"🎬 Filtrando por género: {genre}")
 
+    # ---------- FILTRO POR DIRECTOR ----------
+    for director in movies_df['director'].dropna().unique():
+        if isinstance(director, str) and director.lower() in text:
+            filtered_movies = filtered_movies[filtered_movies['director'].str.contains(director, case=False, na=False)]
+            print(f"🎥 Filtrando por director: {director}")
+            break
+
+    # ---------- FILTRO POR ACTORES ----------
+    for actors_str in movies_df['actors']:
+        if pd.notna(actors_str):
+            for actor in re.split(r',|\s+y\s+', actors_str.lower()):
+                actor = actor.strip()
+                if actor and actor in text:
+                    filtered_movies = filtered_movies[filtered_movies['actors'].str.contains(actor, case=False, na=False)]
+                    print(f"⭐ Filtrando por actor: {actor}")
+                    break
+
+    # ---------- FILTRO POR RATING ----------
+    rating_match = re.search(r'(mayor a|superior a|más de|rating de|calificación de)\s*(\d+(\.\d+)?)', text)
+    if rating_match:
+        rating = float(rating_match.group(2))
+        filtered_movies = filtered_movies[filtered_movies['rating'] >= rating]
+        print(f"⭐ Filtrando por rating mínimo: {rating}")
+
     return filtered_movies
+
+
+def process_user_query(text):
+    """
+    Analiza si el texto es una consulta específica (por año, género, etc.)
+    o una búsqueda general para el sistema de similitud.
+    """
+    text_lower = text.lower()
+    # Palabras clave comunes en consultas precisas
+    keywords = [
+        'película', 'películas', 'ver', 'quiero', 'muéstrame', 'enseñame',
+        'año', 'director', 'actor', 'acción', 'comedia', 'drama', 'terror',
+        'romance', 'rating', 'puntaje', 'popular', 'recientes'
+    ]
+    is_specific = any(k in text_lower for k in keywords)
+    return text_lower, is_specific
+
+
 
 @app.route('/recommend', methods=['POST'])
 def recommend_movies():
@@ -174,14 +225,18 @@ def recommend_movies():
             return jsonify({'error': 'No se recibió texto', 'success': False})
 
         user_text = data['text'].strip()
-        processed_text = user_text.lower()
+        if not user_text:
+            return jsonify({'error': 'Texto vacío', 'success': False})
+
+        processed_text, is_specific_command = process_user_query(user_text)
         recommendations = []
 
-        filtered_movies = apply_precise_filters(user_text)
-        if len(filtered_movies) > 0:
-            filtered_movies = filtered_movies.sort_values('rating', ascending=False).head(6)
-            for _, movie in filtered_movies.iterrows():
-                recommendations.append(movie.to_dict())
+        if is_specific_command:
+            filtered_movies = apply_precise_filters(user_text)
+            if len(filtered_movies) > 0:
+                filtered_movies = filtered_movies.sort_values('rating', ascending=False).head(6)
+                for _, movie in filtered_movies.iterrows():
+                    recommendations.append(movie.to_dict())
 
         if not recommendations:
             user_vector = vectorizer.transform([processed_text])
@@ -191,63 +246,23 @@ def recommend_movies():
                 movie = movies_df.iloc[idx]
                 recommendations.append(movie.to_dict())
 
-        return jsonify({'recommendations': recommendations, 'success': True})
+        return jsonify({
+            'recommendations': recommendations,
+            'strategy': 'precise' if is_specific_command else 'similarity',
+            'success': True
+        })
+
     except Exception as e:
         print(f"❌ Error en recomendaciones: {e}")
         return jsonify({'error': str(e), 'success': False})
 
-# -------------------------------
-# 🍿 RUTAS DE SESIONES DE CINE
-# -------------------------------
-@app.route('/asientos', methods=['GET', 'POST'])
-def asientos():
-    if request.method == 'POST':
-        session['asientos'] = request.form.getlist('asientos')
-        return redirect(url_for('comida'))
-    return render_template('asientos.html')
 
-@app.route('/comida', methods=['GET', 'POST'])
-def comida():
-    if request.method == 'POST':
-        session['comida'] = request.form.getlist('comida')
-        return redirect(url_for('resumen'))
-    return render_template('comida.html')
-
-@app.route('/resumen')
-def resumen():
-    asientos = session.get('asientos', [])
-    comida = session.get('comida', [])
-    total = len(asientos) * 15000 + len(comida) * 8000
-    return render_template('resumen.html', asientos=asientos, comida=comida, total=total)
-# ✅ NUEVA RUTA: Consultar datos actuales de la sesión
-@app.route('/get_session')
-def get_session():
-    return jsonify({
-        'success': True,
-        'session': {
-            'movie': session.get('movie', 'Desconocida'),
-            'seats': session.get('asientos', []),
-            'food': session.get('comida', [])
-        }
-    })
-@app.route('/set_demo_session')
-def set_demo_session():
-    session['movie'] = 'Avatar 2'
-    session['seats'] = ['A1', 'A2']
-    session['food'] = ['Crispetas', 'Gaseosa']
-    return jsonify({'success': True, 'msg': 'Sesión de prueba configurada'})
-
-# -------------------------------
-# 🏠 PÁGINA PRINCIPAL
-# -------------------------------
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# -------------------------------
-# 🚀 EJECUCIÓN
-# -------------------------------
+
 if __name__ == '__main__':
-    print("🚀 Iniciando servidor Flask con AssemblyAI + Sesiones de voz...")
+    print("🚀 Iniciando servidor Flask con AssemblyAI...")
     print("📍 Abre http://localhost:5000 en tu navegador")
     app.run(debug=True, port=5000)
