@@ -1,44 +1,50 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CineVoice - Recomendaciones por Voz</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
     <div class="container mt-5">
-        <h1 class="text-center mb-4">🎬 CineVoice</h1>
-        <p class="text-center">Habla conmigo y te recomendaré películas</p>
-        
-        <div class="card">
-            <div class="card-body">
-                <!-- Grabación de Audio -->
-                <div class="mb-4">
-                    <button id="recordBtn" class="btn btn-primary btn-lg">
-                        🎤 Presiona para hablar
-                    </button>
-                    <button id="stopBtn" class="btn btn-secondary btn-lg" disabled>
-                        ⏹️ Detener
-                    </button>
-                </div>
-                
-                <!-- Transcripción -->
-                <div class="mb-3">
-                    <label class="form-label">Lo que dijiste:</label>
-                    <div id="transcription" class="alert alert-info"></div>
-                </div>
-                
-                <!-- Recomendaciones -->
-                <div id="recommendations" class="mt-4">
-                    <h4>Tus recomendaciones:</h4>
-                    <div id="moviesList"></div>
-                </div>
-            </div>
+      <h1 class="text-center mb-4">🎬 CineVoice</h1>
+      <p class="text-center">Habla conmigo y te recomendaré películas</p>
+
+      <div class="card">
+        <div class="card-body">
+          <!-- Grabación de Audio -->
+          <div class="mb-4">
+            <button id="recordBtn" class="btn btn-primary btn-lg">
+              🎤 Presiona para hablar
+            </button>
+            <button id="stopBtn" class="btn btn-secondary btn-lg" disabled>
+              ⏹️ Detener
+            </button>
+          </div>
+
+          <!-- Transcripción -->
+          <div class="mb-3">
+            <label class="form-label">Lo que dijiste:</label>
+            <div id="transcription" class="alert alert-info"></div>
+          </div>
+
+          <!-- Recomendaciones -->
+          <div id="recommendations" class="mt-4">
+            <h4>Tus recomendaciones:</h4>
+            <div id="moviesList"></div>
+          </div>
         </div>
+      </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-</body>
+  </body>
 </html>
