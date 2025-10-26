@@ -253,4 +253,3 @@ if __name__ == '__main__':
     print("📍 Abre http://localhost:5000 en tu navegador")
     app.run(debug=True, port=5000)
 
-

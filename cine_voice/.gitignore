@@ -6,14 +6,7 @@ venv/
 env/
 ENV/
 
-# Modelos de ML y archivos pesados
-models/
-whisper_model/
-*.pth
-*.bin
-*.dll
-*.onnx
-*.pkl
+
 
 # Cache de Python
 __pycache__/
@@ -55,6 +48,8 @@ temp_audio.wav
 # Sistema
 .DS_Store
 Thumbs.db
+
+.env
 
 
 
