@@ -1,97 +1,103 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Seleccionar Asientos</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
     <style>
-        body {
-            background-color: #0a0a23;
-            color: #fff;
-            font-family: "Poppins", sans-serif;
-            text-align: center;
-            padding: 40px;
-        }
+      body {
+        background-color: #0a0a23;
+        color: #fff;
+        font-family: "Poppins", sans-serif;
+        text-align: center;
+        padding: 40px;
+      }
 
-        h1 {
-            color: #ffd700;
-            margin-bottom: 20px;
-        }
+      h1 {
+        color: #ffd700;
+        margin-bottom: 20px;
+      }
 
-        .asientos-container {
-            display: grid;
-            grid-template-columns: repeat(8, 60px);
-            gap: 10px;
-            justify-content: center;
-            margin-top: 30px;
-        }
+      .asientos-container {
+        display: grid;
+        grid-template-columns: repeat(8, 60px);
+        gap: 10px;
+        justify-content: center;
+        margin-top: 30px;
+      }
 
-        .asiento {
-            width: 60px;
-            height: 60px;
-            border-radius: 10px;
-            background-color: #444;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
+      .asiento {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        background-color: #444;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
 
-        .asiento:hover {
-            background-color: #666;
-        }
+      .asiento:hover {
+        background-color: #666;
+      }
 
-        .asiento.seleccionado {
-            background-color: #28a745;
-            box-shadow: 0 0 10px #28a745;
-        }
+      .asiento.seleccionado {
+        background-color: #28a745;
+        box-shadow: 0 0 10px #28a745;
+      }
 
-        .boton-continuar {
-            margin-top: 30px;
-            padding: 12px 24px;
-            font-size: 18px;
-            background-color: #ffd700;
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+      .boton-continuar {
+        margin-top: 30px;
+        padding: 12px 24px;
+        font-size: 18px;
+        background-color: #ffd700;
+        color: #000;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
 
-        .boton-continuar:hover {
-            background-color: #ffeb3b;
-        }
+      .boton-continuar:hover {
+        background-color: #ffeb3b;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <h1>🎬 Selecciona tus Asientos</h1>
     <p>Haz clic en los asientos que desees reservar.</p>
 
     <div class="asientos-container" id="asientos">
-        <!-- Los asientos se generan dinámicamente -->
+      <!-- Los asientos se generan dinámicamente -->
     </div>
 
     <button class="boton-continuar" onclick="continuar()">Continuar 🍿</button>
 
     <script>
-        const asientosContainer = document.getElementById('asientos');
+      const asientosContainer = document.getElementById("asientos");
 
-        // Generar asientos (8x5)
-        for (let i = 1; i <= 40; i++) {
-            const div = document.createElement('div');
-            div.classList.add('asiento');
-            div.dataset.num = i;
-            div.addEventListener('click', () => div.classList.toggle('seleccionado'));
-            asientosContainer.appendChild(div);
-        }
+      // Generar asientos (8x5)
+      for (let i = 1; i <= 40; i++) {
+        const div = document.createElement("div");
+        div.classList.add("asiento");
+        div.dataset.num = i;
+        div.addEventListener("click", () =>
+          div.classList.toggle("seleccionado")
+        );
+        asientosContainer.appendChild(div);
+      }
 
-        function continuar() {
-            const seleccionados = document.querySelectorAll('.asiento.seleccionado').length;
-            if (seleccionados === 0) {
-                alert("Por favor, selecciona al menos un asiento.");
-                return;
-            }
-            window.location.href = "/comida";
+      function continuar() {
+        const seleccionados = document.querySelectorAll(
+          ".asiento.seleccionado"
+        ).length;
+        if (seleccionados === 0) {
+          alert("Por favor, selecciona al menos un asiento.");
+          return;
         }
+        window.location.href = "/comida";
+      }
     </script>
-</body>
+  </body>
 </html>
-

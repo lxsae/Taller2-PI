@@ -146,3 +146,4 @@ class VoiceRecorder {
 }
 
 window.addEventListener("DOMContentLoaded", () => new VoiceRecorder());
+
