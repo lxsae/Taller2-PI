@@ -3,48 +3,270 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CineVoice - Recomendaciones por Voz</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <title>CineVoice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
     />
-  </head>
-  <body>
-    <div class="container mt-5">
-      <h1 class="text-center mb-4">🎬 CineVoice</h1>
-      <p class="text-center">Habla conmigo y te recomendaré películas</p>
 
-      <div class="card">
-        <div class="card-body">
-          <!-- Grabación de Audio -->
-          <div class="mb-4">
-            <button id="recordBtn" class="btn btn-primary btn-lg">
-              🎤 Presiona para hablar
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
+      .hero-bg {
+        background: linear-gradient(
+          135deg,
+          #0f172a 0%,
+          #1e293b 50%,
+          #334155 100%
+        );
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-bg::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23ffffff" opacity="0.05"/><circle cx="75" cy="75" r="1" fill="%23ffffff" opacity="0.03"/><circle cx="50" cy="10" r="0.5" fill="%23ffffff" opacity="0.08"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        pointer-events: none;
+      }
+
+      .voice-chat-container {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        border: 2px solid #3b82f6;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+      }
+
+      .pulse-recording {
+        animation: pulse 1.5s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+        }
+      }
+
+      .nav-disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-900 text-white">
+    <!-- HEADER -->
+    <header
+      class="bg-black/50 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50"
+    >
+      <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="text-3xl font-bold">🎬 Cinema Explorer</div>
+          </div>
+
+          <nav class="flex space-x-6 items-center">
+            <button
+              class="hover:text-blue-400 transition-colors"
+              onclick="showSection('home')"
+            >
+              Home
             </button>
-            <button id="stopBtn" class="btn btn-secondary btn-lg" disabled>
+            <button
+              class="hover:text-blue-400 transition-colors"
+              onclick="showSection('peliculas')"
+            >
+              Películas
+            </button>
+            <button
+              id="navComida"
+              class="nav-disabled transition-colors"
+              title="Primero selecciona una película"
+              disabled
+            >
+              Comida
+            </button>
+            <button
+              id="navAsientos"
+              class="nav-disabled transition-colors"
+              title="Primero selecciona una película"
+              disabled
+            >
+              Asientos
+            </button>
+            <button
+              id="navPagos"
+              class="nav-disabled transition-colors"
+              title="Completa tu reserva primero"
+              disabled
+            >
+              Pagos
+            </button>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <!-- HOME -->
+    <section
+      id="home"
+      class="hero-bg min-h-screen flex items-center justify-center relative"
+    >
+      <div class="container mx-auto px-6 text-center">
+        <h1 class="text-6xl font-bold mb-8">🎬 CineVoice</h1>
+
+        <!-- Chat de Voz -->
+        <div class="voice-chat-container p-8 max-w-2xl mx-auto mb-8">
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold mb-4">🎤 Asistente Virtual</h2>
+            <div class="bg-blue-500/20 p-4 rounded-lg mb-4">
+              <p class="text-lg">
+                <strong>Asistente:</strong> ¡Hola! Soy tu asistente virtual de
+                CineVoice. ¿Te gustaría buscar una película?
+              </p>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex justify-center gap-4">
+              <button
+                id="recordBtn"
+                class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2"
+              >
+                🎤 Grabar Audio
+              </button>
+
+              <button
+                id="stopBtn"
+                class="bg-gray-600 text-gray-400 px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 cursor-not-allowed"
+                disabled
+              >
+                ⏹️ Detener
+              </button>
+            </div>
+
+            <div id="transcription" class="text-gray-300 min-h-8">
+              Presiona "Grabar Audio" y di que quieres buscar películas...
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN PELÍCULAS -->
+    <section id="peliculas" class="py-20 bg-gray-800/50 hidden">
+      <div class="container mx-auto px-6">
+        <h2 class="text-5xl font-bold text-center mb-16">
+          🎬 Buscar Películas
+        </h2>
+
+        <!-- Búsqueda por voz -->
+        <div class="bg-gray-700/50 p-8 rounded-2xl mb-12 max-w-4xl mx-auto">
+          <div class="text-center mb-8">
+            <h3 class="text-3xl font-bold mb-4">🎤 Buscar por Voz</h3>
+            <p class="text-gray-300 text-lg">
+              Di el género, nombre de película, actor o director que buscas.
+            </p>
+          </div>
+
+          <div
+            class="flex flex-col md:flex-row gap-4 items-center justify-center mb-6"
+          >
+            <button
+              id="recordBtnPeliculas"
+              class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2"
+            >
+              🎤 Grabar Audio
+            </button>
+
+            <button
+              id="stopBtnPeliculas"
+              class="bg-gray-600 text-gray-400 px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 cursor-not-allowed"
+              disabled
+            >
               ⏹️ Detener
             </button>
           </div>
 
-          <!-- Transcripción -->
-          <div class="mb-3">
-            <label class="form-label">Lo que dijiste:</label>
-            <div id="transcription" class="alert alert-info"></div>
+          <div class="bg-black/30 p-4 rounded-xl mb-4">
+            <h4 class="text-lg font-semibold mb-2">📝 Estado:</h4>
+            <div
+              id="transcriptionPeliculas"
+              class="text-gray-300 p-3 bg-gray-900/50 rounded-lg min-h-20"
+            >
+              Presiona "Grabar Audio" y habla para buscar películas...
+            </div>
           </div>
 
-          <!-- Recomendaciones -->
-          <div id="recommendations" class="mt-4">
-            <h4>Tus recomendaciones:</h4>
-            <div id="moviesList"></div>
+          <!-- Instrucciones -->
+          <div
+            id="instruccionesContinuar"
+            class="hidden bg-blue-600/20 border border-blue-600 p-4 rounded-lg mt-4"
+          >
+            <h4 class="text-blue-400 font-semibold mb-2">
+              💡 Instrucciones para continuar:
+            </h4>
+            <p class="text-white text-sm">Presiona "Grabar Audio" y di:</p>
+            <ul class="text-white text-sm mt-1 list-disc list-inside ml-4">
+              <li>"Continuar con comida"</li>
+              <li>"Ir a asientos"</li>
+              <li>"Pagar"</li>
+              <li>"Buscar otra película"</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Resultados -->
+        <div class="mt-12">
+          <h3 class="text-3xl font-bold text-center mb-8">
+            🎞️ Películas Recomendadas
+          </h3>
+          <div
+            id="moviesList"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            <div class="text-center text-gray-400 py-12">
+              <p class="text-xl">
+                Usa la búsqueda por voz para encontrar películas
+              </p>
+              <p class="text-lg mt-2">
+                Ejemplo: "películas de acción", "comedia 2023", "Christopher
+                Nolan"
+              </p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
+
+    <!-- SCRIPTS -->
+    <script>
+      function showSection(id) {
+        document
+          .querySelectorAll("section")
+          .forEach((sec) => sec.classList.add("hidden"));
+        document.getElementById(id).classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    </script>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/voice-assistant.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/voice-recorder-peliculas.js') }}"></script>
   </body>
 </html>
