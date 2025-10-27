@@ -2,143 +2,136 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <title>Seleccionar Comida</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
-    />
-    <style>
-      body {
-        background-color: #0a0a23;
-        color: #fff;
-        font-family: "Poppins", sans-serif;
-        text-align: center;
-        padding: 40px;
-      }
-
-      h1 {
-        color: #ffcc00;
-        margin-bottom: 20px;
-      }
-
-      .comidas-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 30px;
-        margin-top: 30px;
-      }
-
-      .comida {
-        background-color: #222;
-        border-radius: 15px;
-        width: 180px;
-        padding: 20px;
-        box-shadow: 0 0 10px #111;
-        cursor: pointer;
-        transition: 0.3s;
-      }
-
-      .comida:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 20px #ffd700;
-      }
-
-      .comida img {
-        width: 100%;
-        border-radius: 10px;
-      }
-
-      .comida h3 {
-        color: #ffd700;
-        margin: 10px 0 5px;
-      }
-
-      .comida p {
-        color: #ccc;
-        margin: 0;
-      }
-
-      .boton-continuar {
-        margin-top: 30px;
-        padding: 12px 24px;
-        font-size: 18px;
-        background-color: #ffd700;
-        color: #000;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: 0.3s;
-      }
-
-      .boton-continuar:hover {
-        background-color: #ffeb3b;
-      }
-
-      .seleccionado {
-        border: 2px solid #28a745;
-        box-shadow: 0 0 15px #28a745;
-      }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Selección de Comida - CineVoice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <h1>🍿 Selecciona tus Snacks</h1>
-    <p>Elige lo que deseas disfrutar durante la película.</p>
-
-    <div class="comidas-container" id="comidas">
-      <div class="comida" onclick="seleccionar(this)">
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png"
-          alt="Palomitas"
-        />
-        <h3>Palomitas</h3>
-        <p>$10.000</p>
+  <body class="bg-gray-900 text-white min-h-screen">
+    <header
+      class="bg-black/50 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50"
+    >
+      <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="text-3xl font-bold">🎬 CineVoice</div>
+          </div>
+          <nav class="flex space-x-6">
+            <a
+              href="{{ url_for('index') }}"
+              class="hover:text-blue-400 transition-colors"
+              >Inicio</a
+            >
+            <a
+              href="{{ url_for('asientos') }}"
+              class="hover:text-blue-400 transition-colors"
+              >Asientos</a
+            >
+          </nav>
+        </div>
       </div>
-      <div class="comida" onclick="seleccionar(this)">
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/1046/1046786.png"
-          alt="Gaseosa"
-        />
-        <h3>Gaseosa</h3>
-        <p>$8.000</p>
-      </div>
-      <div class="comida" onclick="seleccionar(this)">
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png"
-          alt="Nachos"
-        />
-        <h3>Nachos</h3>
-        <p>$12.000</p>
-      </div>
-      <div class="comida" onclick="seleccionar(this)">
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/1057/1057347.png"
-          alt="Perro caliente"
-        />
-        <h3>Perro caliente</h3>
-        <p>$15.000</p>
-      </div>
-    </div>
+    </header>
 
-    <button class="boton-continuar" onclick="continuar()">
-      Ir al Resumen 💳
-    </button>
+    <main class="container mx-auto px-6 py-12">
+      <h1 class="text-4xl font-bold text-center mb-8">Selecciona tu Comida</h1>
 
-    <script>
-      function seleccionar(element) {
-        element.classList.toggle("seleccionado");
-      }
+      <form
+        method="POST"
+        action="{{ url_for('comida') }}"
+        class="max-w-2xl mx-auto"
+      >
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <!-- Opciones de comida -->
+          <div class="bg-gray-800 p-6 rounded-lg">
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                name="comida"
+                value="Crispetas Grandes"
+                class="w-5 h-5 text-blue-600"
+              />
+              <span class="text-lg">🍿 Crispetas Grandes - $8,000</span>
+            </label>
+          </div>
 
-      function continuar() {
-        const seleccionados = document.querySelectorAll(
-          ".comida.seleccionado"
-        ).length;
-        if (seleccionados === 0) {
-          alert("Selecciona al menos un snack 🍿");
-          return;
-        }
-        window.location.href = "/resumen";
-      }
-    </script>
+          <div class="bg-gray-800 p-6 rounded-lg">
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                name="comida"
+                value="Crispetas Medianas"
+                class="w-5 h-5 text-blue-600"
+              />
+              <span class="text-lg">🍿 Crispetas Medianas - $6,000</span>
+            </label>
+          </div>
+
+          <div class="bg-gray-800 p-6 rounded-lg">
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                name="comida"
+                value="Gaseosa Grande"
+                class="w-5 h-5 text-blue-600"
+              />
+              <span class="text-lg">🥤 Gaseosa Grande - $5,000</span>
+            </label>
+          </div>
+
+          <div class="bg-gray-800 p-6 rounded-lg">
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                name="comida"
+                value="Gaseosa Mediana"
+                class="w-5 h-5 text-blue-600"
+              />
+              <span class="text-lg">🥤 Gaseosa Mediana - $4,000</span>
+            </label>
+          </div>
+
+          <div class="bg-gray-800 p-6 rounded-lg">
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                name="comida"
+                value="Combo Familiar"
+                class="w-5 h-5 text-blue-600"
+              />
+              <span class="text-lg">🎁 Combo Familiar - $20,000</span>
+            </label>
+          </div>
+
+          <div class="bg-gray-800 p-6 rounded-lg">
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                name="comida"
+                value="Hot Dog"
+                class="w-5 h-5 text-blue-600"
+              />
+              <span class="text-lg">🌭 Hot Dog - $7,000</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <button
+            type="submit"
+            class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg text-lg font-semibold transition-colors"
+          >
+            Ir a la seccion de Asientos
+          </button>
+        </div>
+      </form>
+
+      <div class="text-center mt-8">
+        <a
+          href="{{ url_for('index') }}"
+          class="text-gray-400 hover:text-white transition-colors"
+        >
+          ← Volver
+        </a>
+      </div>
+    </main>
   </body>
 </html>
