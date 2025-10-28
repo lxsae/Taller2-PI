@@ -56,7 +56,7 @@ temp_audio.wav
 Thumbs.db
 
 .env
-
+.secret_key
 
 
 # Archivos grandes específicos de PyTorch
