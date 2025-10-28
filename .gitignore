@@ -7,6 +7,12 @@ env/
 ENV/
 
 
+flask_session/
+
+
+
+
+
 
 # Cache de Python
 __pycache__/
