@@ -320,30 +320,36 @@ def comida():
     return render_template("comida.html")
 
 
-# Ruta para procesar selección de comida por voz
-@app.route("/select_food", methods=["POST"])
-def select_food():
-    try:
-        # ✅ VALIDACIÓN: Verificar que el usuario haya seleccionado una película
-        if not session.get("peliculaSeleccionada"):
-            return jsonify(
-                {"error": "Primero debes seleccionar una película", "success": False}
-            )
+# Agrega esta ruta a tu app.py
+@app.route("/pago")
+def pago():
+    # Verificar que el usuario haya completado todos los pasos anteriores
+    if not session.get("peliculaSeleccionada"):
+        return redirect(url_for("index"))
 
-        data = request.get_json()
-        food_items = data.get("food", [])
+    # Verificar que tenga asientos seleccionados
+    if not session.get("asientos"):
+        return redirect(url_for("asientos"))
 
-        if not food_items:
-            return jsonify({"error": "No se seleccionó comida", "success": False})
+    # Obtener datos de la sesión
+    pelicula = session.get("peliculaActual", {})
+    asientos = session.get("asientos", [])
+    comida = session.get("comida", [])
 
-        session["comida"] = food_items
-        print(f"✅ Comida guardada en sesión: {food_items}")
+    # Calcular totales
+    total_asientos = len(asientos) * 15000
+    total_comida = len(comida) * 8000
+    total_general = total_asientos + total_comida
 
-        return jsonify({"success": True, "message": "Comida guardada correctamente"})
-
-    except Exception as e:
-        print(f"❌ Error guardando comida: {e}")
-        return jsonify({"error": str(e), "success": False})
+    return render_template(
+        "pago.html",
+        pelicula=pelicula,
+        asientos=asientos,
+        comida=comida,
+        total_asientos=total_asientos,
+        total_comida=total_comida,
+        total_general=total_general,
+    )
 
 
 @app.route("/resumen")
@@ -415,9 +421,9 @@ def get_session():
     )
 
 
-# Ruta para limpiar la sesión (útil para testing)
-@app.route("/clear_session")
+@app.route("/clear_session", methods=["POST"])
 def clear_session():
+    """Limpiar completamente la sesión"""
     session.clear()
     return jsonify({"success": True, "message": "Sesión limpiada"})
 

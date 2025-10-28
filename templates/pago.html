@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pago - CineVoice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-900 text-white min-h-screen">
+    <header
+      class="bg-black/50 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50"
+    >
+      <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="text-3xl font-bold">🎬 CineVoice</div>
+          </div>
+          <nav class="flex space-x-6">
+            <a
+              href="{{ url_for('index') }}"
+              class="hover:text-blue-400 transition-colors"
+              >Inicio</a
+            >
+            <a
+              href="{{ url_for('resumen') }}"
+              class="hover:text-blue-400 transition-colors"
+              >Resumen</a
+            >
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+      <h1 class="text-4xl font-bold text-center mb-8">💳 Finalizar Compra</h1>
+
+      <!-- Datos para JavaScript -->
+      <script id="peliculaData" type="application/json">
+        {{ pelicula | tojson }}
+      </script>
+      <script id="asientosData" type="application/json">
+        {{ asientos | tojson }}
+      </script>
+      <script id="comidaData" type="application/json">
+        {{ comida | tojson }}
+      </script>
+      <script id="totalesData" type="application/json">
+        {
+            "total_asientos": {{ total_asientos }},
+            "total_comida": {{ total_comida }},
+            "total_general": {{ total_general }}
+        }
+      </script>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Columna izquierda: Resumen -->
+        <div class="lg:col-span-2 space-y-6">
+          <h2 class="text-2xl font-bold mb-6">Resumen de tu Compra</h2>
+
+          <!-- Película -->
+          <div id="peliculaResumen"></div>
+
+          <!-- Asientos -->
+          <div id="asientosResumen"></div>
+
+          <!-- Comida -->
+          <div id="comidaResumen"></div>
+
+          <!-- Totales -->
+          <div id="totalesResumen"></div>
+        </div>
+
+        <!-- Columna derecha: Método de Pago -->
+        <div class="space-y-6">
+          <h2 class="text-2xl font-bold mb-6">Método de Pago</h2>
+
+          <div class="bg-gray-800 rounded-xl p-6">
+            <!-- Selección de método de pago -->
+            <div class="space-y-4 mb-6">
+              <label
+                class="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors"
+              >
+                <input
+                  type="radio"
+                  name="metodoPago"
+                  value="tarjeta"
+                  class="text-blue-600"
+                />
+                <span class="flex items-center space-x-2">
+                  <span class="text-2xl">💳</span>
+                  <span>Tarjeta Crédito/Débito</span>
+                </span>
+              </label>
+
+              <label
+                class="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors"
+              >
+                <input
+                  type="radio"
+                  name="metodoPago"
+                  value="efectivo"
+                  class="text-blue-600"
+                />
+                <span class="flex items-center space-x-2">
+                  <span class="text-2xl">💰</span>
+                  <span>Efectivo</span>
+                </span>
+              </label>
+
+              <label
+                class="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors"
+              >
+                <input
+                  type="radio"
+                  name="metodoPago"
+                  value="transferencia"
+                  class="text-blue-600"
+                />
+                <span class="flex items-center space-x-2">
+                  <span class="text-2xl">🏦</span>
+                  <span>Transferencia</span>
+                </span>
+              </label>
+            </div>
+
+            <!-- Formulario de pago dinámico -->
+            <div id="formularioPago" class="mb-6">
+              <div class="text-center text-gray-400 py-8">
+                <p>Selecciona un método de pago para continuar</p>
+              </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="space-y-4">
+              <button
+                id="confirmarPago"
+                class="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-lg font-semibold transition-colors"
+              >
+                Confirmar Pago
+              </button>
+
+              <button
+                id="cancelarPago"
+                class="w-full bg-gray-600 hover:bg-gray-700 text-white py-4 rounded-lg font-semibold transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+
+          <!-- Información adicional -->
+          <div class="bg-blue-600/20 border border-blue-600 rounded-xl p-4">
+            <h3 class="text-blue-400 font-semibold mb-2">
+              ℹ️ Información Importante
+            </h3>
+            <ul class="text-sm text-blue-200 space-y-1">
+              <li>• Tu reserva será confirmada después del pago</li>
+              <li>• Presenta tu ID al recoger las entradas</li>
+              <li>• Llega 15 minutos antes de la función</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/payment.js') }}"></script>
+  </body>
+</html>
