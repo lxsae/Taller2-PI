@@ -1,331 +1,301 @@
-// static/js/payment.js - Sistema de Pago
-class PaymentSystem {
-    constructor() {
-        this.peliculaData = JSON.parse(document.getElementById('peliculaData').textContent);
-        this.asientosData = JSON.parse(document.getElementById('asientosData').textContent);
-        this.comidaData = JSON.parse(document.getElementById('comidaData').textContent);
-        this.totalesData = JSON.parse(document.getElementById('totalesData').textContent);
+// static/js/payment.js
 
-        this.init();
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    // Cargar datos desde los scripts JSON
+    const pelicula = JSON.parse(document.getElementById('peliculaData').textContent);
+    const asientos = JSON.parse(document.getElementById('asientosData').textContent);
+    const comida = JSON.parse(document.getElementById('comidaData').textContent);
+    const totales = JSON.parse(document.getElementById('totalesData').textContent);
 
-    init() {
-        this.mostrarResumen();
-        this.configurarEventos();
-        this.configurarMetodosPago();
-    }
-
-    mostrarResumen() {
-        // Mostrar película seleccionada
-        this.mostrarPelicula();
-        
-        // Mostrar asientos seleccionados
-        this.mostrarAsientos();
-        
-        // Mostrar comida seleccionada
-        this.mostrarComida();
-        
-        // Mostrar totales
-        this.mostrarTotales();
-    }
-
-    mostrarPelicula() {
-        const peliculaContainer = document.getElementById('peliculaResumen');
-        if (this.peliculaData && this.peliculaData.title) {
-            peliculaContainer.innerHTML = `
-                <div class="bg-gray-800 rounded-xl p-6">
-                    <div class="flex items-center space-x-4">
-                        <div class="text-4xl">🎬</div>
-                        <div>
-                            <h3 class="text-xl font-bold">${this.peliculaData.title}</h3>
-                            <p class="text-gray-400">${this.peliculaData.year || 'Año no disponible'}</p>
-                            <p class="text-gray-300 text-sm mt-2">${this.peliculaData.genres || 'Género no disponible'}</p>
-                        </div>
-                    </div>
+    // Mostrar resumen de película
+    const peliculaResumen = document.getElementById('peliculaResumen');
+    peliculaResumen.innerHTML = `
+        <div class="bg-gray-800 rounded-xl p-6">
+            <h3 class="text-xl font-bold text-yellow-400 mb-4">🎬 Película</h3>
+            <div class="flex items-center space-x-4">
+                <div class="flex-1">
+                    <h4 class="text-lg font-semibold">${pelicula.title}</h4>
+                    <p class="text-gray-400">${pelicula.year} • ${pelicula.genres}</p>
+                    <p class="text-gray-300 mt-2">${pelicula.plot}</p>
                 </div>
-            `;
-        }
-    }
-
-    mostrarAsientos() {
-        const asientosContainer = document.getElementById('asientosResumen');
-        if (this.asientosData && this.asientosData.length > 0) {
-            const asientosList = this.asientosData.map(asiento => 
-                `<span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm">${asiento}</span>`
-            ).join('');
-            
-            asientosContainer.innerHTML = `
-                <div class="bg-gray-800 rounded-xl p-6">
-                    <div class="flex items-center space-x-4 mb-4">
-                        <div class="text-3xl">💺</div>
-                        <div>
-                            <h3 class="text-xl font-bold">Asientos Seleccionados</h3>
-                            <p class="text-gray-400">${this.asientosData.length} asiento(s)</p>
-                        </div>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        ${asientosList}
-                    </div>
+                <div class="text-right">
+                    <div class="text-yellow-400 text-lg font-bold">⭐ ${pelicula.rating}/10</div>
                 </div>
-            `;
-        }
-    }
+            </div>
+        </div>
+    `;
 
-    mostrarComida() {
-        const comidaContainer = document.getElementById('comidaResumen');
-        if (this.comidaData && this.comidaData.length > 0) {
-            const comidaItems = this.comidaData.map(item => {
-                const precio = this.obtenerPrecioComida(item);
-                return `
-                    <div class="flex justify-between items-center py-2 border-b border-gray-700">
-                        <span class="text-gray-300">${item}</span>
-                        <span class="text-green-400 font-semibold">$${precio.toLocaleString()}</span>
+    // Mostrar resumen de asientos
+    const asientosResumen = document.getElementById('asientosResumen');
+    asientosResumen.innerHTML = `
+        <div class="bg-gray-800 rounded-xl p-6">
+            <h3 class="text-xl font-bold text-yellow-400 mb-4">💺 Asientos Seleccionados</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                ${asientos.map(asiento => `
+                    <div class="bg-gray-700 text-center py-2 rounded-lg font-semibold">
+                        ${asiento}
                     </div>
-                `;
-            }).join('');
-            
-            comidaContainer.innerHTML = `
-                <div class="bg-gray-800 rounded-xl p-6">
-                    <div class="flex items-center space-x-4 mb-4">
-                        <div class="text-3xl">🍿</div>
-                        <div>
-                            <h3 class="text-xl font-bold">Comida Seleccionada</h3>
-                            <p class="text-gray-400">${this.comidaData.length} item(s)</p>
+                `).join('')}
+            </div>
+            <div class="flex justify-between items-center border-t border-gray-600 pt-4">
+                <span class="text-lg">${asientos.length} asiento(s) x $15,000</span>
+                <span class="text-yellow-400 text-xl font-bold">$${totales.total_asientos.toLocaleString()}</span>
+            </div>
+        </div>
+    `;
+
+    // Mostrar resumen de comida CON PRECIOS REALES
+    const comidaResumen = document.getElementById('comidaResumen');
+    if (comida.length > 0) {
+        comidaResumen.innerHTML = `
+            <div class="bg-gray-800 rounded-xl p-6">
+                <h3 class="text-xl font-bold text-yellow-400 mb-4">🍿 Comida y Bebidas</h3>
+                <div class="space-y-3 mb-4">
+                    ${comida.map(item => `
+                        <div class="flex justify-between items-center bg-gray-700 p-3 rounded-lg">
+                            <span class="font-semibold">${item.nombre}</span>
+                            <span class="text-yellow-400">$${item.precio.toLocaleString()}</span>
                         </div>
-                    </div>
-                    <div class="space-y-2">
-                        ${comidaItems}
-                    </div>
+                    `).join('')}
                 </div>
-            `;
-        } else {
-            comidaContainer.innerHTML = `
-                <div class="bg-gray-800 rounded-xl p-6">
-                    <div class="flex items-center space-x-4">
-                        <div class="text-3xl">🍿</div>
-                        <div>
-                            <h3 class="text-xl font-bold">Comida Seleccionada</h3>
-                            <p class="text-gray-400">No se seleccionó comida</p>
-                        </div>
-                    </div>
+                <div class="flex justify-between items-center border-t border-gray-600 pt-4">
+                    <span class="text-lg">${comida.length} ítem(s) de comida</span>
+                    <span class="text-yellow-400 text-xl font-bold">$${totales.total_comida.toLocaleString()}</span>
                 </div>
-            `;
-        }
-    }
-
-    obtenerPrecioComida(item) {
-        const precios = {
-            'Crispetas Grandes': 8000,
-            'Crispetas Medianas': 6000,
-            'Gaseosa Grande': 5000,
-            'Gaseosa Mediana': 4000,
-            'Combo Familiar': 20000,
-            'Hot Dog': 7000
-        };
-        return precios[item] || 0;
-    }
-
-    mostrarTotales() {
-        const totalesContainer = document.getElementById('totalesResumen');
-        totalesContainer.innerHTML = `
-            <div class="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-6">
-                <h3 class="text-xl font-bold mb-4">Resumen de Pago</h3>
-                
-                <div class="space-y-3">
-                    <div class="flex justify-between">
-                        <span class="text-gray-200">Asientos (${this.asientosData.length}):</span>
-                        <span class="text-white font-semibold">$${this.totalesData.total_asientos.toLocaleString()}</span>
-                    </div>
-                    
-                    <div class="flex justify-between">
-                        <span class="text-gray-200">Comida (${this.comidaData.length}):</span>
-                        <span class="text-white font-semibold">$${this.totalesData.total_comida.toLocaleString()}</span>
-                    </div>
-                    
-                    <div class="border-t border-white/20 pt-3 mt-3">
-                        <div class="flex justify-between text-lg">
-                            <span class="text-white font-bold">TOTAL:</span>
-                            <span class="text-yellow-400 font-bold">$${this.totalesData.total_general.toLocaleString()}</span>
-                        </div>
-                    </div>
+            </div>
+        `;
+    } else {
+        comidaResumen.innerHTML = `
+            <div class="bg-gray-800 rounded-xl p-6">
+                <h3 class="text-xl font-bold text-yellow-400 mb-4">🍿 Comida y Bebidas</h3>
+                <div class="text-center text-gray-400 py-4">
+                    <p>No se seleccionaron alimentos</p>
                 </div>
             </div>
         `;
     }
 
-    configurarEventos() {
-        // Botón de confirmar pago
-        const confirmarBtn = document.getElementById('confirmarPago');
-        if (confirmarBtn) {
-            confirmarBtn.addEventListener('click', () => this.procesarPago());
-        }
+    // Mostrar totales
+    const totalesResumen = document.getElementById('totalesResumen');
+    totalesResumen.innerHTML = `
+        <div class="bg-yellow-400 text-black rounded-xl p-6">
+            <div class="flex justify-between items-center text-2xl font-bold">
+                <span>TOTAL A PAGAR</span>
+                <span>$${totales.total_general.toLocaleString()}</span>
+            </div>
+            <div class="text-sm text-gray-700 mt-2 text-right">
+                Incluye impuestos
+            </div>
+        </div>
+    `;
 
-        // Botón de cancelar
-        const cancelarBtn = document.getElementById('cancelarPago');
-        if (cancelarBtn) {
-            cancelarBtn.addEventListener('click', () => this.cancelarPago());
-        }
-    }
-
-    configurarMetodosPago() {
-        const metodosPago = document.querySelectorAll('input[name="metodoPago"]');
-        metodosPago.forEach(metodo => {
-            metodo.addEventListener('change', (e) => {
-                this.mostrarFormularioPago(e.target.value);
-            });
+    // Manejar selección de método de pago
+    const metodosPago = document.querySelectorAll('input[name="metodoPago"]');
+    const formularioPago = document.getElementById('formularioPago');
+    
+    metodosPago.forEach(metodo => {
+        metodo.addEventListener('change', function() {
+            mostrarFormularioPago(this.value);
         });
-    }
+    });
 
-    mostrarFormularioPago(metodo) {
-        const formularioContainer = document.getElementById('formularioPago');
+    // Función para mostrar formulario de pago según método seleccionado
+    function mostrarFormularioPago(metodo) {
+        let formularioHTML = '';
         
-        const formularios = {
-            'tarjeta': `
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-gray-300 text-sm font-medium mb-2">Número de Tarjeta</label>
-                        <input type="text" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" placeholder="1234 5678 9012 3456" maxlength="19">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
+        switch(metodo) {
+            case 'tarjeta':
+                formularioHTML = `
+                    <div class="space-y-4">
+                        <h4 class="text-lg font-semibold text-yellow-400">💳 Datos de Tarjeta</h4>
+                        
                         <div>
-                            <label class="block text-gray-300 text-sm font-medium mb-2">Fecha Expiración</label>
-                            <input type="text" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" placeholder="MM/AA">
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Número de Tarjeta</label>
+                            <input type="text" 
+                                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                                   placeholder="1234 5678 9012 3456"
+                                   maxlength="19">
                         </div>
-                        <div>
-                            <label class="block text-gray-300 text-sm font-medium mb-2">CVV</label>
-                            <input type="text" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" placeholder="123" maxlength="3">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-gray-300 text-sm font-medium mb-2">Nombre en la Tarjeta</label>
-                        <input type="text" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" placeholder="JUAN PEREZ">
-                    </div>
-                </div>
-            `,
-            'efectivo': `
-                <div class="bg-yellow-600/20 border border-yellow-600 rounded-lg p-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="text-2xl">💰</div>
-                        <div>
-                            <h4 class="text-yellow-400 font-semibold">Pago en Efectivo</h4>
-                            <p class="text-yellow-200 text-sm">Paga directamente en taquilla al recoger tus entradas</p>
-                        </div>
-                    </div>
-                </div>
-            `,
-            'transferencia': `
-                <div class="bg-green-600/20 border border-green-600 rounded-lg p-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="text-2xl">🏦</div>
-                        <div>
-                            <h4 class="text-green-400 font-semibold">Transferencia Bancaria</h4>
-                            <p class="text-green-200 text-sm">Realiza la transferencia a nuestra cuenta bancaria</p>
-                            <div class="mt-2 text-xs">
-                                <p><strong>Banco:</strong> Banco Nacional</p>
-                                <p><strong>Cuenta:</strong> 123-456789-01</p>
-                                <p><strong>Titular:</strong> CineVoice S.A.S.</p>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Fecha Expiración</label>
+                                <input type="text" 
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                                       placeholder="MM/AA">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">CVV</label>
+                                <input type="text" 
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                                       placeholder="123"
+                                       maxlength="3">
                             </div>
                         </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Nombre en la Tarjeta</label>
+                            <input type="text" 
+                                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                                   placeholder="JUAN PEREZ">
+                        </div>
                     </div>
-                </div>
-            `
-        };
-
-        formularioContainer.innerHTML = formularios[metodo] || '';
+                `;
+                break;
+                
+            case 'efectivo':
+                formularioHTML = `
+                    <div class="text-center py-4">
+                        <div class="text-6xl mb-4">💰</div>
+                        <h4 class="text-lg font-semibold text-yellow-400 mb-2">Pago en Efectivo</h4>
+                        <p class="text-gray-300">Realiza el pago en las taquillas del cine</p>
+                        <p class="text-gray-400 text-sm mt-2">Presenta este código al llegar:</p>
+                        <div class="bg-yellow-400 text-black font-mono font-bold text-xl py-2 px-4 rounded-lg mt-2 inline-block">
+                            CINE-${Math.random().toString(36).substr(2, 8).toUpperCase()}
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            case 'transferencia':
+                formularioHTML = `
+                    <div class="space-y-4">
+                        <h4 class="text-lg font-semibold text-yellow-400">🏦 Transferencia Bancaria</h4>
+                        
+                        <div class="bg-gray-700 p-4 rounded-lg">
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">Banco:</span>
+                                    <span class="font-semibold">Bancolombia</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">Tipo de cuenta:</span>
+                                    <span class="font-semibold">Corriente</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">Número de cuenta:</span>
+                                    <span class="font-semibold">123-456789-01</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">Titular:</span>
+                                    <span class="font-semibold">CineVoice SAS</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">Monto a transferir:</span>
+                                    <span class="font-semibold text-yellow-400">$${totales.total_general.toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p class="text-gray-400 text-sm">Envía el comprobante a: comprobantes@cinevoice.com</p>
+                    </div>
+                `;
+                break;
+                
+            default:
+                formularioHTML = `
+                    <div class="text-center text-gray-400 py-8">
+                        <p>Selecciona un método de pago para continuar</p>
+                    </div>
+                `;
+        }
+        
+        formularioPago.innerHTML = formularioHTML;
     }
 
-    async procesarPago() {
-        const metodoPago = document.querySelector('input[name="metodoPago"]:checked');
+    // Manejar confirmación de pago
+    const confirmarPagoBtn = document.getElementById('confirmarPago');
+    confirmarPagoBtn.addEventListener('click', function() {
+        const metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
         
-        if (!metodoPago) {
-            this.mostrarMensaje('❌ Por favor selecciona un método de pago', 'error');
+        if (!metodoSeleccionado) {
+            alert('Por favor selecciona un método de pago');
             return;
         }
+        
+        // Mostrar tarjeta flotante de agradecimiento
+        mostrarAgradecimiento();
+    });
 
-        // Mostrar loading
-        this.mostrarLoading();
+    // Manejar cancelación
+    const cancelarPagoBtn = document.getElementById('cancelarPago');
+    cancelarPagoBtn.addEventListener('click', function() {
+        if (confirm('¿Estás seguro de que quieres cancelar el pago?')) {
+            window.location.href = '/comida';
+        }
+    });
 
-        try {
-            // Simular procesamiento de pago
-            await new Promise(resolve => setTimeout(resolve, 3000));
-
-            // En una aplicación real, aquí iría la integración con la pasarela de pago
-            const response = await fetch("/procesar_pago", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    metodo_pago: metodoPago.value,
-                    total: this.totalesData.total_general,
-                    pelicula: this.peliculaData,
-                    asientos: this.asientosData,
-                    comida: this.comidaData
-                })
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                this.mostrarMensaje('✅ ¡Pago procesado exitosamente!', 'success');
-                // Redirigir a confirmación
-                setTimeout(() => {
-                    window.location.href = '/confirmacion';
-                }, 2000);
-            } else {
-                this.mostrarMensaje('❌ Error al procesar el pago: ' + result.error, 'error');
+    // Función para mostrar tarjeta de agradecimiento
+    function mostrarAgradecimiento() {
+        // Crear overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        overlay.id = 'agradecimientoOverlay';
+        
+        // Crear tarjeta de agradecimiento
+        overlay.innerHTML = `
+            <div class="bg-gray-800 rounded-2xl p-8 mx-4 max-w-md w-full transform scale-95 animate-scaleIn">
+                <div class="text-center">
+                    <!-- Ícono de éxito -->
+                    <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    
+                    <!-- Mensaje -->
+                    <h3 class="text-2xl font-bold text-white mb-4">¡Pago Exitoso! 🎉</h3>
+                    <p class="text-gray-300 mb-2">Muchas gracias por hacer uso de nuestros servicios</p>
+                    <p class="text-gray-400 text-sm mb-6">Tu reserva ha sido confirmada exitosamente</p>
+                    
+                    <!-- Botón -->
+                    <button id="irACreditos" 
+                            class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-6 rounded-lg transition-colors duration-300 transform hover:scale-105">
+                        Ver Créditos y Colaboradores
+                    </button>
+                    
+                    <!-- Información adicional -->
+                    <div class="mt-6 p-4 bg-gray-700 rounded-lg">
+                        <p class="text-green-400 text-sm font-semibold mb-2">✅ Reserva Confirmada</p>
+                        <p class="text-gray-400 text-xs">Código de reserva: <span class="font-mono">CINE-${Math.random().toString(36).substr(2, 8).toUpperCase()}</span></p>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Agregar estilos de animación
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes scaleIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.8);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
             }
-
-        } catch (error) {
-            console.error("Error procesando pago:", error);
-            this.mostrarMensaje('❌ Error de conexión al procesar el pago', 'error');
-        } finally {
-            this.ocultarLoading();
-        }
-    }
-
-    cancelarPago() {
-        if (confirm('¿Estás seguro de que quieres cancelar el pago? Se perderá tu reserva.')) {
-            window.location.href = '/';
-        }
-    }
-
-    mostrarLoading() {
-        const boton = document.getElementById('confirmarPago');
-        boton.disabled = true;
-        boton.innerHTML = `
-            <div class="flex items-center justify-center space-x-2">
-                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Procesando...</span>
-            </div>
+            .animate-scaleIn {
+                animation: scaleIn 0.3s ease-out forwards;
+            }
         `;
-    }
-
-    ocultarLoading() {
-        const boton = document.getElementById('confirmarPago');
-        boton.disabled = false;
-        boton.textContent = 'Confirmar Pago';
-    }
-
-    mostrarMensaje(mensaje, tipo) {
-        const mensajeDiv = document.createElement('div');
-        mensajeDiv.className = `fixed top-4 right-4 p-4 rounded-lg z-50 ${
-            tipo === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
-        }`;
-        mensajeDiv.innerHTML = `
-            <div class="flex items-center space-x-2">
-                <span class="text-lg">${tipo === 'success' ? '✅' : '❌'}</span>
-                <span>${mensaje}</span>
-            </div>
-        `;
+        document.head.appendChild(style);
         
-        document.body.appendChild(mensajeDiv);
+        // Agregar al documento
+        document.body.appendChild(overlay);
         
-        setTimeout(() => {
-            mensajeDiv.remove();
-        }, 5000);
+        // Manejar clic en el botón de créditos
+        document.getElementById('irACreditos').addEventListener('click', function() {
+            window.location.href = '/creditos';
+        });
+        
+        // Cerrar al hacer clic fuera de la tarjeta
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) {
+                document.body.removeChild(overlay);
+                document.head.removeChild(style);
+            }
+        });
     }
-}
-
-// Inicializar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-    new PaymentSystem();
 });

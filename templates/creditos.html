@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Créditos - CineVoice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-900 text-white min-h-screen">
+    <header
+      class="bg-black/50 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50"
+    >
+      <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="text-3xl font-bold">🎬 CineVoice</div>
+          </div>
+          <nav class="flex space-x-6">
+            <a
+              href="{{ url_for('index') }}"
+              class="hover:text-blue-400 transition-colors"
+              >Inicio</a
+            >
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+      <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-yellow-400 mb-4">
+          🌟 Créditos y Colaboradores
+        </h1>
+        <p class="text-xl text-gray-300">
+          Conoce al equipo detrás de CineVoice
+        </p>
+      </div>
+
+      <!-- Sección de Desarrolladores -->
+      <div class="max-w-6xl mx-auto">
+        <div class="bg-gray-800 rounded-2xl p-8 mb-8">
+          <h2 class="text-2xl font-bold text-yellow-400 mb-6 text-center">
+            💻 Equipo de Desarrollo
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Desarrollador 1 -->
+            <div
+              class="bg-gray-700 rounded-xl p-6 text-center hover:transform hover:scale-105 transition-all duration-300"
+            >
+              <div
+                class="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"
+              >
+                👨‍💻
+              </div>
+              <h3 class="text-lg font-bold mb-2">Sebastian Miller</h3>
+              <p class="text-gray-300 text-sm mb-3">Desarrollador Full Stack</p>
+              <p class="text-gray-400 text-xs">Backend & Arquitectura</p>
+            </div>
+
+            <!-- Desarrollador 2 -->
+            <div
+              class="bg-gray-700 rounded-xl p-6 text-center hover:transform hover:scale-105 transition-all duration-300"
+            >
+              <div
+                class="w-20 h-20 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"
+              >
+                👩‍💻
+              </div>
+              <h3 class="text-lg font-bold mb-2">Ana Mezu</h3>
+              <p class="text-gray-300 text-sm mb-3">Frontend Developer</p>
+              <p class="text-gray-400 text-xs">UI/UX & JavaScript</p>
+            </div>
+
+            <!-- Desarrollador 3 -->
+            <div
+              class="bg-gray-700 rounded-xl p-6 text-center hover:transform hover:scale-105 transition-all duration-300"
+            >
+              <div
+                class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"
+              >
+                🎨
+              </div>
+              <h3 class="text-lg font-bold mb-2">Leandro Acevedo</h3>
+              <p class="text-gray-300 text-sm mb-3">Diseñador UI/UX</p>
+              <p class="text-gray-400 text-xs">Diseño & Experiencia</p>
+            </div>
+
+            <!-- Desarrollador 4 -->
+            <div
+              class="bg-gray-700 rounded-xl p-6 text-center hover:transform hover:scale-105 transition-all duration-300"
+            >
+              <div
+                class="w-20 h-20 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"
+              >
+                🗄️
+              </div>
+              <h3 class="text-lg font-bold mb-2">Ivan Noriega</h3>
+              <p class="text-gray-300 text-sm mb-3">Database Architect</p>
+              <p class="text-gray-400 text-xs">Base de Datos & API</p>
+            </div>
+
+            <!-- Desarrollador 5 -->
+            <div
+              class="bg-gray-700 rounded-xl p-6 text-center hover:transform hover:scale-105 transition-all duration-300"
+            >
+              <div
+                class="w-20 h-20 bg-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"
+              >
+                🤖
+              </div>
+              <h3 class="text-lg font-bold mb-2">Juan Valencia</h3>
+              <p class="text-gray-300 text-sm mb-3">AI Specialist</p>
+              <p class="text-gray-400 text-xs">Machine Learning & Voice AI</p>
+            </div>
+
+            <!-- Desarrollador 6 -->
+            <div
+              class="bg-gray-700 rounded-xl p-6 text-center hover:transform hover:scale-105 transition-all duration-300"
+            >
+              <div
+                class="w-20 h-20 bg-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"
+              >
+                🚀
+              </div>
+              <h3 class="text-lg font-bold mb-2">Nicolas Garces</h3>
+              <p class="text-gray-300 text-sm mb-3">DevOps Engineer</p>
+              <p class="text-gray-400 text-xs">Infraestructura & Deployment</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección de Roles y Responsabilidades -->
+        <div class="bg-gray-800 rounded-2xl p-8 mb-8">
+          <h2 class="text-2xl font-bold text-yellow-400 mb-6 text-center">
+            🎯 Roles del Proyecto
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-gray-700 rounded-lg p-4">
+              <h3 class="font-semibold text-lg mb-2 text-blue-400">
+                Backend Team
+              </h3>
+              <ul class="text-sm text-gray-300 space-y-1">
+                <li>• Desarrollo con Flask</li>
+                <li>• Integración de APIs</li>
+                <li>• Gestión de sesiones</li>
+                <li>• Lógica de negocio</li>
+              </ul>
+            </div>
+            <div class="bg-gray-700 rounded-lg p-4">
+              <h3 class="font-semibold text-lg mb-2 text-purple-400">
+                Frontend Team
+              </h3>
+              <ul class="text-sm text-gray-300 space-y-1">
+                <li>• Interfaz de usuario</li>
+                <li>• Experiencia interactiva</li>
+                <li>• Diseño responsive</li>
+                <li>• JavaScript dinámico</li>
+              </ul>
+            </div>
+            <div class="bg-gray-700 rounded-lg p-4">
+              <h3 class="font-semibold text-lg mb-2 text-green-400">
+                AI & Innovation
+              </h3>
+              <ul class="text-sm text-gray-300 space-y-1">
+                <li>• Integración AssemblyAI</li>
+                <li>• Sistema de recomendación</li>
+                <li>• Procesamiento de voz</li>
+                <li>• Machine Learning</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección de Tecnologías -->
+        <div class="bg-gray-800 rounded-2xl p-8 mb-8">
+          <h2 class="text-2xl font-bold text-yellow-400 mb-6 text-center">
+            🛠 Tecnologías Utilizadas
+          </h2>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-gray-700 rounded-lg p-4 text-center">
+              <div class="text-3xl mb-2">🐍</div>
+              <p class="font-semibold">Python</p>
+              <p class="text-gray-400 text-sm">Flask</p>
+            </div>
+            <div class="bg-gray-700 rounded-lg p-4 text-center">
+              <div class="text-3xl mb-2">⚡</div>
+              <p class="font-semibold">JavaScript</p>
+              <p class="text-gray-400 text-sm">Frontend</p>
+            </div>
+            <div class="bg-gray-700 rounded-lg p-4 text-center">
+              <div class="text-3xl mb-2">🎨</div>
+              <p class="font-semibold">Tailwind CSS</p>
+              <p class="text-gray-400 text-sm">Styling</p>
+            </div>
+            <div class="bg-gray-700 rounded-lg p-4 text-center">
+              <div class="text-3xl mb-2">🤖</div>
+              <p class="font-semibold">AssemblyAI</p>
+              <p class="text-gray-400 text-sm">Voice AI</p>
+            </div>
+            <div class="bg-gray-700 rounded-lg p-4 text-center">
+              <div class="text-3xl mb-2">📊</div>
+              <p class="font-semibold">Pandas</p>
+              <p class="text-gray-400 text-sm">Data Analysis</p>
+            </div>
+            <div class="bg-gray-700 rounded-lg p-4 text-center">
+              <div class="text-3xl mb-2">🔍</div>
+              <p class="font-semibold">Scikit-learn</p>
+              <p class="text-gray-400 text-sm">ML & Recomendación</p>
+            </div>
+            <div class="bg-gray-700 rounded-lg p-4 text-center">
+              <div class="text-3xl mb-2">🎬</div>
+              <p class="font-semibold">TMDB API</p>
+              <p class="text-gray-400 text-sm">Datos de Películas</p>
+            </div>
+            <div class="bg-gray-700 rounded-lg p-4 text-center">
+              <div class="text-3xl mb-2">💾</div>
+              <p class="font-semibold">Flask Session</p>
+              <p class="text-gray-400 text-sm">Gestión de Estado</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección de Agradecimientos -->
+        <div class="bg-gray-800 rounded-2xl p-8">
+          <h2 class="text-2xl font-bold text-yellow-400 mb-6 text-center">
+            🙏 Agradecimientos Especiales
+          </h2>
+
+          <div class="space-y-4">
+            <div class="bg-gray-700 rounded-lg p-4">
+              <h3 class="font-semibold text-lg mb-2">TMDB API</h3>
+              <p class="text-gray-300 text-sm">
+                Gracias por proporcionar los datos de películas que hacen
+                posible esta experiencia.
+              </p>
+            </div>
+
+            <div class="bg-gray-700 rounded-lg p-4">
+              <h3 class="font-semibold text-lg mb-2">AssemblyAI</h3>
+              <p class="text-gray-300 text-sm">
+                Por la tecnología de voz que permite búsquedas por comandos de
+                voz.
+              </p>
+            </div>
+
+            <div class="bg-gray-700 rounded-lg p-4">
+              <h3 class="font-semibold text-lg mb-2">Comunidad Open Source</h3>
+              <p class="text-gray-300 text-sm">
+                A todos los contribuyentes de las librerías y herramientas
+                utilizadas.
+              </p>
+            </div>
+
+            <div class="bg-gray-700 rounded-lg p-4">
+              <h3 class="font-semibold text-lg mb-2">Equipo de Testing</h3>
+              <p class="text-gray-300 text-sm">
+                A todos los testers que ayudaron a mejorar la experiencia de
+                usuario.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información del Proyecto -->
+        <div class="text-center mt-8">
+          <div class="bg-yellow-400 text-gray-900 rounded-xl p-6 inline-block">
+            <h3 class="text-xl font-bold mb-2">CineVoice v1.0</h3>
+            <p class="text-sm">
+              Sistema de reservas de cine con control por voz
+            </p>
+            <p class="text-xs mt-2">© 2024 Todos los derechos reservados</p>
+            <div class="mt-3 flex justify-center space-x-4">
+              <span
+                class="text-xs bg-gray-800 text-yellow-400 px-2 py-1 rounded"
+                >Flask</span
+              >
+              <span
+                class="text-xs bg-gray-800 text-yellow-400 px-2 py-1 rounded"
+                >JavaScript</span
+              >
+              <span
+                class="text-xs bg-gray-800 text-yellow-400 px-2 py-1 rounded"
+                >Tailwind</span
+              >
+              <span
+                class="text-xs bg-gray-800 text-yellow-400 px-2 py-1 rounded"
+                >AssemblyAI</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Botón flotante para volver al inicio -->
+    <div class="fixed bottom-6 right-6">
+      <button
+        onclick="window.location.href='{{ url_for('index') }}'"
+        class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 flex items-center space-x-2"
+      >
+        <span>🏠</span>
+        <span>Inicio</span>
+      </button>
+    </div>
+  </body>
+</html>

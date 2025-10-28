@@ -340,19 +340,42 @@ def get_occupied_seats():
     return jsonify({"occupied_seats": occupied_seats, "success": True})
 
 
-@app.route("/comida", methods=["GET", "POST"])
+@app.route("/comida")
 def comida():
     # ✅ VALIDACIÓN: Verificar que el usuario haya seleccionado una película
     if not session.get("peliculaSeleccionada"):
         return redirect(url_for("index"))
+    
 
-    if request.method == "POST":
-        session["comida"] = request.form.getlist("comida")
-        return redirect(url_for("asientos"))
+        
     return render_template("comida.html")
+@app.route("/save_food", methods=["POST"])
+def save_food():
+    try:
+        data = request.get_json()
+        food_selection = data.get("food", [])
+        
+        # Guardar en sesión
+        session["comida"] = food_selection
+        print(f"✅ Comida guardada en sesión: {food_selection}")
+        
+        return jsonify({"success": True, "message": "Comida guardada correctamente"})
+    except Exception as e:
+        print(f"❌ Error guardando comida: {e}")
+        return jsonify({"error": str(e), "success": False})
+# -------------------------------
+# 🍕 PRECIOS DE COMIDA
+# -------------------------------
+PRECIOS_COMIDA = {
+    "Palomitas": 10000,
+    "Gaseosa": 18000,
+    "Nachos": 22000,
+    "Perro caliente": 25000,
+    "Combo 1": 65000,
+    "Combo 2": 42000
+}
 
-
-# Agrega esta ruta a tu app.py
+# Ruta para la página de pago
 @app.route("/pago")
 def pago():
     # Verificar que el usuario haya completado todos los pasos anteriores
@@ -366,23 +389,35 @@ def pago():
     # Obtener datos de la sesión
     pelicula = session.get("peliculaActual", {})
     asientos = session.get("asientos", [])
-    comida = session.get("comida", [])
+    comida_seleccionada = session.get("comida", [])
 
-    # Calcular totales
-    total_asientos = len(asientos) * 15000
-    total_comida = len(comida) * 8000
+    # Calcular totales con precios reales
+    precio_por_asiento = 15000
+    total_asientos = len(asientos) * precio_por_asiento
+    
+    # Calcular total de comida usando los precios reales
+    total_comida = 0
+    comida_detallada = []
+    
+    for item in comida_seleccionada:
+        precio = PRECIOS_COMIDA.get(item, 0)
+        total_comida += precio
+        comida_detallada.append({
+            "nombre": item,
+            "precio": precio
+        })
+
     total_general = total_asientos + total_comida
 
     return render_template(
         "pago.html",
         pelicula=pelicula,
         asientos=asientos,
-        comida=comida,
+        comida=comida_detallada,  # Ahora enviamos comida_detallada en lugar de solo los nombres
         total_asientos=total_asientos,
         total_comida=total_comida,
-        total_general=total_general,
+        total_general=total_general
     )
-
 
 @app.route("/resumen")
 def resumen():
@@ -394,15 +429,33 @@ def resumen():
     if not session.get("asientos"):
         return redirect(url_for("asientos"))
 
-    # CORRECCIÓN: Usar 'comida' en lugar de 'resumen'
+    # Obtener datos de la sesión
+    pelicula = session.get("peliculaActual", {})
     asientos = session.get("asientos", [])
-    comida = session.get("comida", [])  # ✅ Corregido aquí
-    total = len(asientos) * 15000 + len(comida) * 8000
+    comida_seleccionada = session.get("comida", [])
+    
+    # Calcular totales con precios reales
+    total_asientos = len(asientos) * 15000
+    total_comida = sum(PRECIOS_COMIDA.get(item, 0) for item in comida_seleccionada)
+    total = total_asientos + total_comida
+
+    # Preparar datos detallados de comida para el template
+    comida_detallada = []
+    for item in comida_seleccionada:
+        comida_detallada.append({
+            "nombre": item,
+            "precio": PRECIOS_COMIDA.get(item, 0)
+        })
 
     return render_template(
-        "resumen.html", asientos=asientos, comida=comida, total=total
+        "resumen.html", 
+        pelicula=pelicula,
+        asientos=asientos, 
+        comida=comida_detallada,
+        total_asientos=total_asientos,
+        total_comida=total_comida,
+        total=total
     )
-
 
 # Ruta para guardar la película seleccionada
 @app.route("/select_movie", methods=["POST"])
@@ -434,7 +487,7 @@ def payment():
     # ✅ VALIDACIÓN: Verificar que el usuario pueda acceder al pago
     if not session.get("peliculaSeleccionada") or not session.get("asientos"):
         return redirect(url_for("index"))
-    return redirect(url_for("resumen"))
+    return redirect(url_for("index"))
 
 
 # ✅ NUEVA RUTA: Consultar datos actuales de la sesión
@@ -452,6 +505,11 @@ def get_session():
         }
     )
 
+
+# Ruta para la página de créditos
+@app.route("/creditos")
+def creditos():
+    return render_template("creditos.html")
 
 @app.route("/clear_session", methods=["POST"])
 def clear_session():
