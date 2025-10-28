@@ -8,6 +8,7 @@ import os
 import re
 import assemblyai as aai
 from flask_session import Session
+import requests
 import secrets
 
 # -------------------------------
@@ -53,35 +54,72 @@ Session(app)
 # -------------------------------
 aai.settings.api_key = os.getenv("ASSEMBLYAI_API_KEY")
 
+# -------------------------------
+# ⚙️ MAPEO DE GÉNEROS TMDB
+# -------------------------------
+GENRE_MAPPING = {
+    28: "Acción",
+    12: "Aventura",
+    16: "Animación",
+    35: "Comedia",
+    80: "Crimen",
+    99: "Documental",
+    18: "Drama",
+    10751: "Familiar",
+    14: "Fantasía",
+    36: "Historia",
+    27: "Terror",
+    10402: "Música",
+    9648: "Misterio",
+    10749: "Romance",
+    878: "Ciencia ficción",
+    10770: "Película de TV",
+    53: "Suspense",
+    10752: "Bélica",
+    37: "Western"
+}
+
 
 # -------------------------------
-# 🎬 CARGA DE DATOS DE PELÍCULAS
+# 🎬 CARGA DE DATOS DE PELÍCULAS DESDE TMDB
 # -------------------------------
 def load_movie_data():
     try:
-        movies_df = pd.read_csv("data/movies.csv")
-        print("✅ CSV cargado correctamente")
+        api_key = os.getenv("TMDB_API_KEY")
+        if not api_key:
+            raise Exception("TMDB_API_KEY no encontrada en .env")
+
+        url = f"https://api.themoviedb.org/3/movie/popular?api_key={api_key}&language=es-ES&page=1"
+        response = requests.get(url)
+
+        if response.status_code != 200:
+            raise Exception(f"Error en TMDB API: {response.status_code} - {response.text}")
+
+        data = response.json()
+        movies = []
+
+        for movie in data.get('results', []):
+            # Mapear géneros usando el diccionario estático
+            genres = [GENRE_MAPPING.get(gid, "Desconocido") for gid in movie.get('genre_ids', [])]
+            genres_str = ', '.join(genres) if genres else 'Desconocido'
+
+            # Crear diccionario con solo los campos requeridos
+            movie_dict = {
+                'title': movie.get('title', 'Título desconocido'),
+                'genres': genres_str,
+                'year': movie.get('release_date', '2000-01-01')[:10],  # Formato YYYY-MM-DD
+                'plot': movie.get('overview', 'Descripción no disponible'),
+                'rating': movie.get('vote_average', 7.0)
+            }
+            movies.append(movie_dict)
+
+        movies_df = pd.DataFrame(movies)
+        print("✅ Datos cargados desde TMDB correctamente")
         print(f"📊 Total de películas cargadas: {len(movies_df)}")
-
-        movies_df = movies_df.dropna(subset=["title", "genres", "year"])
-        movies_df["year"] = (
-            pd.to_numeric(movies_df["year"], errors="coerce").fillna(2000).astype(int)
-        )
-
-        # Completar columnas faltantes
-        for col, default in {
-            "actors": "Desconocido",
-            "director": "Desconocido",
-            "plot": "Descripción no disponible",
-            "mood": "varios",
-            "rating": 7.0,
-        }.items():
-            if col not in movies_df.columns:
-                movies_df[col] = default
 
         return movies_df
     except Exception as e:
-        print(f"❌ ERROR cargando CSV: {e}")
+        print(f"❌ ERROR cargando datos de TMDB: {e}")
         raise SystemExit(1)
 
 
@@ -97,12 +135,6 @@ def prepare_recommendation_system():
             movies_df["title"]
             + " "
             + movies_df["genres"]
-            + " "
-            + movies_df["actors"]
-            + " "
-            + movies_df["director"]
-            + " "
-            + movies_df["mood"]
             + " "
             + movies_df["plot"]
         )
@@ -195,7 +227,7 @@ def apply_precise_filters(user_text, movies_subset=None):
     year_match = re.search(r"\b(19|20)\d{2}\b", text)
     if year_match:
         year = int(year_match.group())
-        filtered_movies = filtered_movies[filtered_movies["year"] == year]
+        filtered_movies = filtered_movies[filtered_movies["year"].str.startswith(str(year))]
         print(f"📅 Filtrando por año: {year}")
 
     genre_keywords = {
