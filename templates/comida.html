@@ -3,135 +3,144 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Selección de Comida - CineVoice</title>
+    <title>🍿 Selección de Comida - CineVoice</title>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body class="bg-gray-900 text-white min-h-screen">
+
+  <body class="bg-gray-900 text-white min-h-screen font-poppins">
     <header
       class="bg-black/50 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50"
     >
-      <div class="container mx-auto px-6 py-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <div class="text-3xl font-bold">🎬 CineVoice</div>
-          </div>
-          <nav class="flex space-x-6">
-            <a
-              href="{{ url_for('index') }}"
-              class="hover:text-blue-400 transition-colors"
-              >Inicio</a
-            >
-            <a
-              href="{{ url_for('asientos') }}"
-              class="hover:text-blue-400 transition-colors"
-              >Asientos</a
-            >
-          </nav>
-        </div>
+      <div
+        class="container mx-auto px-6 py-4 flex justify-between items-center"
+      >
+        <div class="text-3xl font-bold">🎬 CineVoice</div>
+        <nav class="flex space-x-6">
+          <a href="{{ url_for('index') }}" class="hover:text-blue-400"
+            >Inicio</a
+          >
+          <a href="{{ url_for('asientos') }}" class="hover:text-blue-400"
+            >Asientos</a
+          >
+        </nav>
       </div>
     </header>
 
-    <main class="container mx-auto px-6 py-12">
-      <h1 class="text-4xl font-bold text-center mb-8">Selecciona tu Comida</h1>
+    <main class="container mx-auto px-6 py-10 text-center">
+      <h1 class="text-4xl font-bold text-yellow-400 mb-6">
+        🍿 Selecciona tus Snacks
+      </h1>
+      <p class="text-gray-400 mb-10">
+        Elige lo que deseas disfrutar durante la película.
+      </p>
 
-      <form
-        method="POST"
-        action="{{ url_for('comida') }}"
-        class="max-w-2xl mx-auto"
+      <!-- Contenedor de comidas -->
+      <div
+        id="comidas"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 justify-center"
       >
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <!-- Opciones de comida -->
-          <div class="bg-gray-800 p-6 rounded-lg">
-            <label class="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                name="comida"
-                value="Crispetas Grandes"
-                class="w-5 h-5 text-blue-600"
-              />
-              <span class="text-lg">🍿 Crispetas Grandes - $8,000</span>
-            </label>
-          </div>
-
-          <div class="bg-gray-800 p-6 rounded-lg">
-            <label class="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                name="comida"
-                value="Crispetas Medianas"
-                class="w-5 h-5 text-blue-600"
-              />
-              <span class="text-lg">🍿 Crispetas Medianas - $6,000</span>
-            </label>
-          </div>
-
-          <div class="bg-gray-800 p-6 rounded-lg">
-            <label class="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                name="comida"
-                value="Gaseosa Grande"
-                class="w-5 h-5 text-blue-600"
-              />
-              <span class="text-lg">🥤 Gaseosa Grande - $5,000</span>
-            </label>
-          </div>
-
-          <div class="bg-gray-800 p-6 rounded-lg">
-            <label class="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                name="comida"
-                value="Gaseosa Mediana"
-                class="w-5 h-5 text-blue-600"
-              />
-              <span class="text-lg">🥤 Gaseosa Mediana - $4,000</span>
-            </label>
-          </div>
-
-          <div class="bg-gray-800 p-6 rounded-lg">
-            <label class="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                name="comida"
-                value="Combo Familiar"
-                class="w-5 h-5 text-blue-600"
-              />
-              <span class="text-lg">🎁 Combo Familiar - $20,000</span>
-            </label>
-          </div>
-
-          <div class="bg-gray-800 p-6 rounded-lg">
-            <label class="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                name="comida"
-                value="Hot Dog"
-                class="w-5 h-5 text-blue-600"
-              />
-              <span class="text-lg">🌭 Hot Dog - $7,000</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="text-center">
-          <button
-            type="submit"
-            class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg text-lg font-semibold transition-colors"
-          >
-            Ir a la seccion de Asientos
-          </button>
-        </div>
-      </form>
-
-      <div class="text-center mt-8">
-        <a
-          href="{{ url_for('index') }}"
-          class="text-gray-400 hover:text-white transition-colors"
+        <div
+          class="comida bg-gray-800 rounded-xl p-4 cursor-pointer hover:scale-105 transition"
+          onclick="seleccionar(this)"
         >
-          ← Volver
-        </a>
+          <img
+            src="https://plus.unsplash.com/premium_photo-1676049461949-185dcea09d77?auto=format&fit=crop&q=60&w=900"
+            class="rounded-lg mb-3 w-full h-40 object-cover"
+          />
+          <h3 class="text-yellow-400 font-semibold">Palomitas</h3>
+          <p>$10.000</p>
+        </div>
+
+        <div
+          class="comida bg-gray-800 rounded-xl p-4 cursor-pointer hover:scale-105 transition"
+          onclick="seleccionar(this)"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1735643434124-f51889fa1f8c?auto=format&fit=crop&q=60&w=900"
+            class="rounded-lg mb-3 w-full h-40 object-cover"
+          />
+          <h3 class="text-yellow-400 font-semibold">Gaseosa</h3>
+          <p>$18.000</p>
+        </div>
+
+        <div
+          class="comida bg-gray-800 rounded-xl p-4 cursor-pointer hover:scale-105 transition"
+          onclick="seleccionar(this)"
+        >
+          <img
+            src="https://plus.unsplash.com/premium_photo-1680086903412-d9e00eb08af5?auto=format&fit=crop&q=60&w=900"
+            class="rounded-lg mb-3 w-full h-40 object-cover"
+          />
+          <h3 class="text-yellow-400 font-semibold">Nachos</h3>
+          <p>$22.000</p>
+        </div>
+
+        <div
+          class="comida bg-gray-800 rounded-xl p-4 cursor-pointer hover:scale-105 transition"
+          onclick="seleccionar(this)"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1599599810694-b5b37304c041?auto=format&fit=crop&q=80&w=927"
+            class="rounded-lg mb-3 w-full h-40 object-cover"
+          />
+          <h3 class="text-yellow-400 font-semibold">Perro caliente</h3>
+          <p>$25.000</p>
+        </div>
+
+        <div
+          class="comida bg-gray-800 rounded-xl p-4 cursor-pointer hover:scale-105 transition"
+          onclick="seleccionar(this)"
+        >
+          <img
+            src="https://i.ibb.co/k2NCG0D3/unnamed-3.jpg"
+            class="rounded-lg mb-3 w-full h-40 object-cover"
+          />
+          <h3 class="text-yellow-400 font-semibold">Combo 1</h3>
+          <p>$65.000</p>
+        </div>
+
+        <div
+          class="comida bg-gray-800 rounded-xl p-4 cursor-pointer hover:scale-105 transition"
+          onclick="seleccionar(this)"
+        >
+          <img
+            src="https://i.ibb.co/v4bcTpMy/unnamed-2.jpg"
+            class="rounded-lg mb-3 w-full h-40 object-cover"
+          />
+          <h3 class="text-yellow-400 font-semibold">Combo 2</h3>
+          <p>$42.000</p>
+        </div>
+      </div>
+      <script>
+        function seleccionar(element) {
+          element.classList.toggle("seleccionado");
+
+          const seleccionadas = Array.from(
+            document.querySelectorAll(".comida.seleccionado")
+          ).map((el) => el.querySelector("h3").textContent.trim());
+
+          fetch("/save_food", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ food: seleccionadas }),
+          });
+        }
+
+        function continuar() {
+          window.location.href = "/pago";
+        }
+      </script>
+      <!-- Botones -->
+      <div class="mt-10 flex flex-col items-center space-y-4">
+        <button
+          id="confirmFood"
+          class="bg-yellow-400 hover:bg-yellow-500 text-black px-8 py-3 rounded-lg text-lg font-semibold transition"
+        >
+          Continuar
+        </button>
       </div>
     </main>
+
+    <script src="{{ url_for('static', filename='js/comida.js') }}"></script>
   </body>
 </html>

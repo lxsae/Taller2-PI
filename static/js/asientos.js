@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Redirigir más rápido
                 setTimeout(() => {
-                    window.location.href = '/resumen';
+                    window.location.href = '/pago';
                 }, 2000);
             } else {
                 updateStatusMessage('❌ Error al confirmar la reserva: ' + result.error, 'error');
