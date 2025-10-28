@@ -6,7 +6,7 @@
 ![License](https://img.shields.io/badge/Licencia-MIT-orange)
 
 Sistema completo de reservas de cine que combina inteligencia artificial de voz con un sistema de recomendaciones personalizado para ofrecer una experiencia cinematográfica única e intuitiva.
-
+  
 ## ✨ Características Principales
 
 ### 🎤 Control por Voz Avanzado
