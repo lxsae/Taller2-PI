@@ -1,5 +1,10 @@
 # 🎬 CineVoice - Sistema Inteligente de Reservas de Cine con Control por Voz
 
+![CineVoice](https://img.shields.io/badge/CineVoice-v1.0-yellow)
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
+![Flask](https://img.shields.io/badge/Flask-2.3.0-green)
+![License](https://img.shields.io/badge/Licencia-MIT-orange)
+
 Sistema completo de reservas de cine que combina inteligencia artificial de voz con un sistema de recomendaciones personalizado para ofrecer una experiencia cinematográfica única e intuitiva.
 
 ## ✨ Características Principales
